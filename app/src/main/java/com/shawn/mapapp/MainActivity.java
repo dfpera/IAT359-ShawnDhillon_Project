@@ -32,6 +32,7 @@ MainActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Welcome Back " + sharedPrefs.getString("username", DEFAULT), Toast.LENGTH_LONG).show();
             Intent intent= new Intent(this, MapsActivity.class); // Send user to settings activity
+            intent.putExtra("username", sharedPrefs.getString("username", DEFAULT));
             startActivity(intent);
 
             // If username/password is NOT correct send user to register activity
@@ -50,6 +51,7 @@ MainActivity extends AppCompatActivity {
 
     public void toMap(View view) {
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("username", "TestUser");
         startActivity(intent);
     }
 

@@ -20,11 +20,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.shawn.mapapp.database.MyDatabase;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, SensorEventListener {
     //Start Sensor Manager
     SensorManager mSensorManager;
     Sensor myLightSensor;
+    MyDatabase db;
 
     boolean isDay = true;
 
@@ -44,6 +46,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Get sensor services, along with light sensor
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         myLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+        db = new MyDatabase(this);
     }
 
     @Override
@@ -140,7 +144,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void search(View view) {
+        Intent oldIntent = getIntent();
         Intent intent = new Intent(this, SearchActivity.class);
+        intent.putExtra("username", oldIntent.getStringExtra("username"));
         startActivity(intent);
+    }
+
+    public void saveMarker(View view) {
+        Intent intent = getIntent();
+        long id = db.insertData("name", 10.203942, 9.94930, 1.0f, intent.getStringExtra("username"), "");
+        if (id < 0) {
+            Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
+        }
     }
 }
