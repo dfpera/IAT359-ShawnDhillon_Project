@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 public class MyDatabase {
     private SQLiteDatabase db;
@@ -42,6 +43,11 @@ public class MyDatabase {
 
         String selection = Constants.USERNAME + "='" + username + "'";  //Constants.USERNAME = 'username'
         Cursor cursor = db.query(Constants.TABLE_NAME, columns, selection, null, null, null, null);
+
+        // TODO: Remove when recycler vew works
+        cursor.moveToFirst();
+        Toast.makeText(context, username + ": " + cursor.getString(cursor.getColumnIndex(Constants.NAME)) + ", " + cursor.getCount() + ", imagePath: " + cursor.getString(cursor.getColumnIndex(Constants.IMG_PATH)), Toast.LENGTH_LONG).show();
+
 
         return cursor;
     }

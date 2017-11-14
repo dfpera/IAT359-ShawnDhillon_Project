@@ -26,22 +26,23 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
 
     @Override
     public SearchItemAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_item,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_item, parent, false);
         MyViewHolder viewHolder = new MyViewHolder(v);
         cursor.moveToFirst();
+        Toast.makeText(context, cursor.getString(cursor.getColumnIndex(Constants.NAME)), Toast.LENGTH_LONG).show();
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(SearchItemAdapter.MyViewHolder holder, int position) {
-        if (!cursor.isAfterLast()) {
+        //if (!cursor.isAfterLast()) {
+            cursor.moveToPosition(position);
             holder.locationName.setText(cursor.getString(cursor.getColumnIndex(Constants.NAME)));
             holder.longitude.setText(cursor.getString(cursor.getColumnIndex(Constants.LONG)));
             holder.latitude.setText(cursor.getString(cursor.getColumnIndex(Constants.LAT)));
             // TODO: Implement image from path
             // holder.locationImg.setText(cursor.getString(cursor.getColumnIndex(Constants.imgPath)));
-            cursor.moveToNext();
-        }
+        //}
     }
 
 

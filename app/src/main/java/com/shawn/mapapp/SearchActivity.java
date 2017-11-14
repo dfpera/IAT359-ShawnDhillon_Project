@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.shawn.mapapp.database.Constants;
 import com.shawn.mapapp.database.MyDatabase;
@@ -16,7 +17,6 @@ public class SearchActivity extends AppCompatActivity {
     private RecyclerView searchView;
     private MyDatabase db;
     private SearchItemAdapter searchAdapter;
-    private MyHelper helper;
     private Cursor result;
 
     private EditText searchBar;
@@ -28,13 +28,13 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         db = new MyDatabase(this);
-        helper = new MyHelper(this);
 
         searchView = (RecyclerView) findViewById(R.id.rvItems);
 
         intent = getIntent();
         if (intent.hasExtra("username")) {
             result = db.getData(intent.getStringExtra("username"));
+            Toast.makeText(this, intent.getStringExtra("username"), Toast.LENGTH_LONG).show();
         }
 
         searchAdapter = new SearchItemAdapter(result);
