@@ -45,14 +45,15 @@ public class MyDatabase {
         Cursor cursor = db.query(Constants.TABLE_NAME, columns, selection, null, null, null, null);
 
         // TODO: Remove when recycler vew works
-        cursor.moveToFirst();
-        Toast.makeText(context, username + ": " + cursor.getString(cursor.getColumnIndex(Constants.NAME)) + ", " + cursor.getCount() + ", imagePath: " + cursor.getString(cursor.getColumnIndex(Constants.IMG_PATH)), Toast.LENGTH_LONG).show();
+//        cursor.moveToFirst();
+//        Toast.makeText(context, username + ": " + cursor.getString(cursor.getColumnIndex(Constants.NAME)) + ", " + cursor.getCount() + ", imagePath: " + cursor.getString(cursor.getColumnIndex(Constants.IMG_PATH)), Toast.LENGTH_LONG).show();
 
 
         return cursor;
     }
 
-    // TODO: Search db based on name of location
+    // TODO: Search DB based on whether name CONTAINS string
+    // TODO: Fix selection query to check for username and location name
     public Cursor getSelectedData(String username, String name)
     {
         // Select the markers that are owned by a username
@@ -60,9 +61,9 @@ public class MyDatabase {
         // Returns these columns in the query
         String[] columns = {Constants.NAME, Constants.LONG, Constants.LAT, Constants.Z_INDEX, Constants.IMG_PATH};
 
-        String selection = Constants.USERNAME + "='" + username + "'";  //Constants.USERNAME = 'username'
-        Cursor cursor = db.query(Constants.TABLE_NAME, columns, selection, null, null, null, null);
-
+        String selection = Constants.USERNAME + "='" + username + "', " + Constants.NAME + "='" + name + "'";
+//        Cursor cursor = db.query(Constants.TABLE_NAME, columns, selection, null, null, null, null);
+        Cursor cursor = db.rawQuery("SELECT MARKER_NAME, LONGITUTDE, LATITUDE, Z_INDEX, IMG_PATH FROM LOCATION_TABLE WHERE MARKER_NAME='" + name + "'", null);
         return cursor;
     }
 

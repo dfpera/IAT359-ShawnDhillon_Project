@@ -14,5 +14,5 @@ public class Constants {
     public static final String Z_INDEX = "Z_INDEX";
     public static final String USERNAME = "USERNAME";
     public static final String IMG_PATH = "IMG_PATH";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 }

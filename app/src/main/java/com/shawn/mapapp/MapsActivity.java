@@ -14,8 +14,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -39,23 +44,23 @@ public class MapsActivity extends FragmentActivity implements
         SensorEventListener,
         GoogleMap.OnMapClickListener,
         GoogleMap.OnMarkerDragListener,
-        GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnInfoWindowLongClickListener,
-        GoogleMap.OnInfoWindowCloseListener,
         GoogleMap.OnMarkerClickListener {
 
     //Start Sensor Manager
     SensorManager mSensorManager;
     Sensor myLightSensor;
     MyDatabase db;
+    ActionMode mActionMode;
 
     boolean isDay = true; // TODO: Fix night mode starting in night
+    boolean isMapReady = false;
 
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final int RESULT_LOAD_IMG = 0;
+    private static final int RESULT_LOAD_IMG_2 = 1;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -204,10 +209,6 @@ public class MapsActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Use a custom info window adapter to handle multiple lines of text in the
-        // info window contents.
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
-
         // Prompt the user for permission.
         getLocationPermission();
 
@@ -219,10 +220,9 @@ public class MapsActivity extends FragmentActivity implements
 
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
-        mMap.setOnInfoWindowClickListener(this);
         mMap.setOnMarkerDragListener(this);
-        mMap.setOnInfoWindowCloseListener(this);
-        mMap.setOnInfoWindowLongClickListener(this);
+
+        isMapReady = true;
 
     }
 
@@ -264,28 +264,33 @@ public class MapsActivity extends FragmentActivity implements
             //If light sensor value is less than 2, change theme to night mode.
             if(sensorEvent.values[0] < 3 && isDay) {
                 Toast.makeText(this, "Night Mode Activated.", Toast.LENGTH_SHORT).show();
+                if (isMapReady) {
 
-                isDay = false;
+                    isDay = false;
 
-                try {
-                    // Customise the styling of the base map using a JSON object defined
-                    // in a raw resource file.
-                    boolean success = mMap.setMapStyle(
-                            MapStyleOptions.loadRawResourceStyle(
-                                    this, R.raw.night_mode));
+                    try {
+                        // Customise the styling of the base map using a JSON object defined
+                        // in a raw resource file.
+                        boolean success = mMap.setMapStyle(
+                                MapStyleOptions.loadRawResourceStyle(
+                                        this, R.raw.night_mode));
 
-                    if (!success) {
-                        Log.e(TAG, "Style parsing failed.");
+                        if (!success) {
+                            Log.e(TAG, "Style parsing failed.");
+                        }
+                    } catch (Resources.NotFoundException e) {
+                        Log.e(TAG, "Can't find style. Error: ", e);
                     }
-                } catch (Resources.NotFoundException e) {
-                    Log.e(TAG, "Can't find style. Error: ", e);
                 }
 
             // If light sensor value is greater than 3, change theme to day mode.
             } else if (sensorEvent.values[0] > 5 && !isDay) {
                 Toast.makeText(this, "Day Mode Activated.", Toast.LENGTH_SHORT).show();
 
+
+
                 isDay = true;
+
 
                 try {
                     // Customise the styling of the base map using a JSON object defined
@@ -322,6 +327,11 @@ public class MapsActivity extends FragmentActivity implements
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, RESULT_LOAD_IMG);
     }
+    public void saveMarker2(View view) {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, RESULT_LOAD_IMG_2);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -338,6 +348,28 @@ public class MapsActivity extends FragmentActivity implements
 //                }
                 Intent intent = getIntent();
                 long id = db.insertData("name", 10.203942, 9.94930, 1.0f, intent.getStringExtra("username"), imageUri.toString());
+                if (id < 0) {
+                    Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show();
+            }
+        }
+        if (requestCode == RESULT_LOAD_IMG_2) {
+            if (resultCode == RESULT_OK) {
+//                try {
+                Uri imageUri = data.getData();
+                // TODO: Move to search recycler view
+//                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+//                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
+//                }
+                Intent intent = getIntent();
+                long id = db.insertData("green", 10.203942, 9.94930, 1.0f, intent.getStringExtra("username"), imageUri.toString());
                 if (id < 0) {
                     Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
                 } else {
@@ -386,50 +418,58 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        showEditDialog();
         return false;
     }
 
-    /** Demonstrates customizing the info window and/or its contents. */
-    class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+//    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+//
+//        // Called when the action mode is created; startActionMode() was called
+//        @Override
+//        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+//            // Inflate a menu resource providing context menu items
+//            MenuInflater inflater = mode.getMenuInflater();
+//            inflater.inflate(R.menu.context_menu, menu);
+//            return true;
+//        }
+//
+//        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+//        // may be called multiple times if the mode is invalidated.
+//        @Override
+//        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+//            return false; // Return false if nothing is done
+//        }
+//
+//        // Called when the user selects a contextual menu item
+//        @Override
+//        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+//            switch (item.getItemId()) {
+//                case R.id.imageButton:
+//
+//                    mode.finish(); // Action picked, so close the CAB
+//                    return true;
+//                case R.id.saveButton:
+//
+//                    mode.finish(); // Action picked, so close the CAB
+//                    return true;
+//                default:
+//                    return false;
+//            }
+//        }
+//
+//        // Called when the user exits the action mode
+//        @Override
+//        public void onDestroyActionMode(ActionMode mode) {
+//            mActionMode = null;
+//        }
+//    };
 
-        // These are both viewgroups containing an ImageView with id "badge" and two TextViews with id
-        // "title" and "snippet".
-        private final View mWindow;
-
-        private final View mContents;
-
-        CustomInfoWindowAdapter() {
-            mWindow = getLayoutInflater().inflate(R.layout.info_modal, null);
-            mContents = getLayoutInflater().inflate(R.layout.info_modal_contents, null);
-        }
-
-        @Override
-        public View getInfoWindow(Marker marker) {
-            // TODO: Populate window
-            return mWindow;
-        }
-
-        @Override
-        public View getInfoContents(Marker marker) {
-            // TODO: Populate window
-            return mContents;
-        }
+    private void showEditDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        InfoModal infoModal = InfoModal.newInstance("Some Title");
+        infoModal.show(fm, "fragment_edit_name");
     }
 
-    @Override
-    public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(this, "Clicked Info Window", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onInfoWindowClose(Marker marker) {
-        Toast.makeText(this, "Info Window Closed", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onInfoWindowLongClick(Marker marker) {
-        Toast.makeText(this, "Long Clicked Info Window", Toast.LENGTH_SHORT).show();
-    }
 
     // TODO: Add ability to clear markers
 }

@@ -33,10 +33,10 @@ public class SearchActivity extends AppCompatActivity {
 
         intent = getIntent();
         if (intent.hasExtra("username")) {
-            result = db.getData(intent.getStringExtra("username"));
-            Toast.makeText(this, intent.getStringExtra("username"), Toast.LENGTH_LONG).show();
+            result = db.getData(intent.getExtras().getString("username"));
         }
 
+        // TODO: make sure works when nothing is in the DB
         searchAdapter = new SearchItemAdapter(result);
         searchView.setAdapter(searchAdapter);
 
@@ -46,8 +46,10 @@ public class SearchActivity extends AppCompatActivity {
     // TODO: Replace recycler view with new cursor
     public void search(View view) {
         String location = searchBar.getText().toString();
-        if (location.length() <= 0) {
-            result = db.getSelectedData(intent.getStringExtra("username"), location);
+        if (location.length() > 0) {
+            result = db.getSelectedData(intent.getExtras().getString("username"), location);
+            searchAdapter.cursor = result;
+            searchAdapter.notifyDataSetChanged();
         }
     }
 

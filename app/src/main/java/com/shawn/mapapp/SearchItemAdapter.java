@@ -28,8 +28,6 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
     public SearchItemAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_item, parent, false);
         MyViewHolder viewHolder = new MyViewHolder(v);
-        cursor.moveToFirst();
-        Toast.makeText(context, cursor.getString(cursor.getColumnIndex(Constants.NAME)), Toast.LENGTH_LONG).show();
         return viewHolder;
     }
 
@@ -44,7 +42,6 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
             // holder.locationImg.setText(cursor.getString(cursor.getColumnIndex(Constants.imgPath)));
         //}
     }
-
 
     @Override
     public int getItemCount() {
