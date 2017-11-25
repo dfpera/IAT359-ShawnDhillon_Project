@@ -2,6 +2,9 @@ package com.shawn.mapapp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,8 @@ import android.widget.Toast;
 
 import com.shawn.mapapp.database.Constants;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.MyViewHolder> {
@@ -33,14 +38,26 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
 
     @Override
     public void onBindViewHolder(SearchItemAdapter.MyViewHolder holder, int position) {
-        //if (!cursor.isAfterLast()) {
-            cursor.moveToPosition(position);
-            holder.locationName.setText(cursor.getString(cursor.getColumnIndex(Constants.NAME)));
-            holder.longitude.setText(cursor.getString(cursor.getColumnIndex(Constants.LONG)));
-            holder.latitude.setText(cursor.getString(cursor.getColumnIndex(Constants.LAT)));
-            // TODO: Implement image from path
-            // holder.locationImg.setText(cursor.getString(cursor.getColumnIndex(Constants.imgPath)));
-        //}
+        cursor.moveToPosition(position);
+        holder.locationName.setText(cursor.getString(cursor.getColumnIndex(Constants.NAME)));
+        holder.longitude.setText(cursor.getString(cursor.getColumnIndex(Constants.LONG)));
+        holder.latitude.setText(cursor.getString(cursor.getColumnIndex(Constants.LAT)));
+
+        // Set image
+        String imageString = cursor.getString(cursor.getColumnIndex(Constants.IMG_PATH));
+        Toast.makeText(context, "uri: " + imageString, Toast.LENGTH_SHORT).show();
+//        if (imageString != "") {
+//            try {
+//                Uri imageUri = Uri.parse(imageString);
+//                Toast.makeText(context, "uri: " + imageUri.toString(), Toast.LENGTH_SHORT).show();
+//                final InputStream imageStream = context.getContentResolver().openInputStream(imageUri);
+//                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+//                holder.locationImg.setImageBitmap(selectedImage);
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//                Toast.makeText(context, "Something went wrong when loading image.", Toast.LENGTH_LONG).show();
+//            }
+//        }
     }
 
     @Override

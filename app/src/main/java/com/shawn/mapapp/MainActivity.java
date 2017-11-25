@@ -31,7 +31,7 @@ MainActivity extends AppCompatActivity {
                 && sharedPrefs.getString("password", DEFAULT).equals(passwordEditText.getText().toString())) {
 
             Toast.makeText(this, "Welcome Back " + sharedPrefs.getString("username", DEFAULT), Toast.LENGTH_LONG).show();
-            Intent intent= new Intent(this, MapsActivity.class); // Send user to settings activity
+            Intent intent= new Intent(this, MapsActivity.class); // Send user to map activity
             intent.putExtra("username", sharedPrefs.getString("username", DEFAULT));
             startActivity(intent);
 

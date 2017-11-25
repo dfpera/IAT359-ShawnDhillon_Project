@@ -52,7 +52,7 @@ public class MapsActivity extends FragmentActivity implements
     MyDatabase db;
     ActionMode mActionMode;
 
-    boolean isDay = true; // TODO: Fix night mode starting in night
+    boolean isDay = true;
     boolean isMapReady = false;
 
     private GoogleMap mMap;
@@ -339,7 +339,7 @@ public class MapsActivity extends FragmentActivity implements
             if (resultCode == RESULT_OK) {
 //                try {
                     Uri imageUri = data.getData();
-                    // TODO: Move to search recycler view
+                    // TODO: Move to search recycler view and info window
 //                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
 //                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
 //                } catch (FileNotFoundException e) {
@@ -418,55 +418,22 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        showEditDialog();
+        showEditDialog(marker);
         return false;
     }
 
-//    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
-//
-//        // Called when the action mode is created; startActionMode() was called
-//        @Override
-//        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//            // Inflate a menu resource providing context menu items
-//            MenuInflater inflater = mode.getMenuInflater();
-//            inflater.inflate(R.menu.context_menu, menu);
-//            return true;
-//        }
-//
-//        // Called each time the action mode is shown. Always called after onCreateActionMode, but
-//        // may be called multiple times if the mode is invalidated.
-//        @Override
-//        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//            return false; // Return false if nothing is done
-//        }
-//
-//        // Called when the user selects a contextual menu item
-//        @Override
-//        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//            switch (item.getItemId()) {
-//                case R.id.imageButton:
-//
-//                    mode.finish(); // Action picked, so close the CAB
-//                    return true;
-//                case R.id.saveButton:
-//
-//                    mode.finish(); // Action picked, so close the CAB
-//                    return true;
-//                default:
-//                    return false;
-//            }
-//        }
-//
-//        // Called when the user exits the action mode
-//        @Override
-//        public void onDestroyActionMode(ActionMode mode) {
-//            mActionMode = null;
-//        }
-//    };
 
-    private void showEditDialog() {
+    private void showEditDialog(Marker marker) {
         FragmentManager fm = getSupportFragmentManager();
         InfoModal infoModal = InfoModal.newInstance("Some Title");
+
+        Intent oldIntent = getIntent();
+        Bundle bundle = new Bundle();
+        bundle.putString("username", oldIntent.getStringExtra("username"));
+        bundle.putDouble("lat", marker.getPosition().latitude);
+        bundle.putDouble("long", marker.getPosition().longitude);
+        infoModal.setArguments(bundle);
+
         infoModal.show(fm, "fragment_edit_name");
     }
 

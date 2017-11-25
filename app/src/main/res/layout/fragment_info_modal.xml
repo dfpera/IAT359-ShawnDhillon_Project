@@ -19,20 +19,26 @@
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_weight="1"
+        android:layout_width="128dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/cast_album_art_placeholder" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <EditText
         android:id="@+id/locationName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName" />
+
+
 
     <LinearLayout
         android:layout_width="match_parent"

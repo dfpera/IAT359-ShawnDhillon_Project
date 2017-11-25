@@ -34,20 +34,24 @@ public class SearchActivity extends AppCompatActivity {
         intent = getIntent();
         if (intent.hasExtra("username")) {
             result = db.getData(intent.getExtras().getString("username"));
+            if (result.getCount() == 0) {
+                Toast.makeText(this, "There are no locations saved.", Toast.LENGTH_SHORT).show();
+            }
         }
 
-        // TODO: make sure works when nothing is in the DB
         searchAdapter = new SearchItemAdapter(result);
         searchView.setAdapter(searchAdapter);
 
         searchBar = (EditText) findViewById(R.id.searchEditText);
     }
 
-    // TODO: Replace recycler view with new cursor
     public void search(View view) {
         String location = searchBar.getText().toString();
         if (location.length() > 0) {
             result = db.getSelectedData(intent.getExtras().getString("username"), location);
+            if (result.getCount() == 0) {
+                Toast.makeText(this, "No results found.", Toast.LENGTH_SHORT).show();
+            }
             searchAdapter.cursor = result;
             searchAdapter.notifyDataSetChanged();
         }
