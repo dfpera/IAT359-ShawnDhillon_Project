@@ -1,10 +1,14 @@
 package com.shawn.mapapp;
 
+import android.*;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,15 +28,19 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
 
     public Cursor cursor;
     Context context;
+    String username;
 
-    public SearchItemAdapter(Cursor cursor) {
+
+    public SearchItemAdapter(Cursor cursor, Context context, String username) {
+        this.context = context;
         this.cursor = cursor;
+        this.username = username;
     }
 
     @Override
     public SearchItemAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_item, parent, false);
-        MyViewHolder viewHolder = new MyViewHolder(v);
+        MyViewHolder viewHolder = new MyViewHolder(v, username);
         return viewHolder;
     }
 
@@ -44,20 +52,22 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
         holder.latitude.setText(cursor.getString(cursor.getColumnIndex(Constants.LAT)));
 
         // Set image
-        String imageString = cursor.getString(cursor.getColumnIndex(Constants.IMG_PATH));
-        Toast.makeText(context, "uri: " + imageString, Toast.LENGTH_SHORT).show();
-//        if (imageString != "") {
-//            try {
-//                Uri imageUri = Uri.parse(imageString);
-//                Toast.makeText(context, "uri: " + imageUri.toString(), Toast.LENGTH_SHORT).show();
-//                final InputStream imageStream = context.getContentResolver().openInputStream(imageUri);
-//                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-//                holder.locationImg.setImageBitmap(selectedImage);
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//                Toast.makeText(context, "Something went wrong when loading image.", Toast.LENGTH_LONG).show();
-//            }
-//        }
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            String imageString = cursor.getString(cursor.getColumnIndex(Constants.IMG_PATH));
+            if (imageString != "") {
+                try {
+                    Uri imageUri = Uri.parse(imageString);
+                    final InputStream imageStream = context.getContentResolver().openInputStream(imageUri);
+                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    holder.locationImg.setImageBitmap(selectedImage);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Something went wrong when loading image.", Toast.LENGTH_LONG).show();
+                }
+            }
+        } else {
+            Toast.makeText(context, "Cannot load image without persmissions granted.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -72,13 +82,15 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
         public TextView latitude;
         public ImageView locationImg;
         public LinearLayout myLayout;
+        public String username;
 
         Context context;
 
-        public MyViewHolder(View itemView) {
+        public MyViewHolder(View itemView, String username) {
             super(itemView);
             myLayout = (LinearLayout) itemView;
 
+            this.username = username;
             locationName = (TextView) itemView.findViewById(R.id.locationName);
             longitude = (TextView) itemView.findViewById(R.id.longitude);
             latitude = (TextView) itemView.findViewById(R.id.latitude);
@@ -91,9 +103,12 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.My
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(context,
-                    "You have clicked " + (locationName).getText().toString(),
-                    Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(context, MapsActivity.class);
+            intent.putExtra("lat", latitude.getText());
+            intent.putExtra("long", longitude.getText());
+            intent.putExtra("locationname", locationName.getText());
+            intent.putExtra("username", username);
+            context.startActivity(intent);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.shawn.mapapp;
 
+import android.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -69,8 +70,8 @@ public class MapsActivity extends FragmentActivity implements
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean mLocationPermissionGranted; // TODO: Fix constant asking for persmissions
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;;
+    private boolean mLocationPermissionGranted;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -143,14 +144,18 @@ public class MapsActivity extends FragmentActivity implements
      * device. The result of the permission request is handled by a callback,
      * onRequestPermissionsResult.
      */
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-        } else {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            // permission to access the location is missing
+
+            // request permission at runtime
             ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        } else if (mMap != null) {
+            mLocationPermissionGranted = true;
         }
     }
 
@@ -181,19 +186,19 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
+                                           String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+            case LOCATION_PERMISSION_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
+                    updateLocationUI();
+                } else {
+                    Toast.makeText(this, "Permission NOT granted", Toast.LENGTH_SHORT).show();
                 }
+                return;
             }
         }
-        updateLocationUI();
     }
 
     /**
@@ -215,8 +220,20 @@ public class MapsActivity extends FragmentActivity implements
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
+
+        // Load marker location if marker was selected
+        Intent oldIntent = getIntent();
+        if (oldIntent.hasExtra("lat")) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(Double.parseDouble(oldIntent.getExtras().getString("lat")), Double.parseDouble(oldIntent.getExtras().getString("long"))))
+                    .title(oldIntent.getExtras().getString("locationname"))
+                    .draggable(true));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(Double.parseDouble(oldIntent.getExtras().getString("lat")), Double.parseDouble(oldIntent.getExtras().getString("long"))), DEFAULT_ZOOM));
+        } else {
+            // Get the current location of the device and set the position of the map.
+            getDeviceLocation();
+        }
 
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);

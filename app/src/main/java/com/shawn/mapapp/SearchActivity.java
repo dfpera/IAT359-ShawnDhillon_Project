@@ -39,7 +39,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         }
 
-        searchAdapter = new SearchItemAdapter(result);
+        searchAdapter = new SearchItemAdapter(result, this, intent.getExtras().getString("username"));
         searchView.setAdapter(searchAdapter);
 
         searchBar = (EditText) findViewById(R.id.searchEditText);

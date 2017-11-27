@@ -108,7 +108,7 @@ public class InfoModal extends DialogFragment implements View.OnClickListener {
                 latitude = bundle.getDouble("lat");
                 longitude = bundle.getDouble("long");
             }
-            long id = db.insertData(locationName.getText().toString(), latitude, longitude, 1.0f, username, imageString);
+            long id = db.insertData(locationName.getText().toString(), longitude, latitude,1.0f, username, imageString);
             if (id < 0) {
                 Toast.makeText(getContext(), "fail", Toast.LENGTH_SHORT).show();
             } else {
