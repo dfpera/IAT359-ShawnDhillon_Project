@@ -97,10 +97,4 @@ MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void toMap(View view) {
-        Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra("username", "TestUser");
-        startActivity(intent);
-    }
-
 }

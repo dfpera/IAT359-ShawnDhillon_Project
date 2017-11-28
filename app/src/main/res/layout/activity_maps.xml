@@ -23,25 +23,5 @@
         android:onClick="search"
         android:text="Search" />
 
-    <Button
-        android:id="@+id/saveMarker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:onClick="saveMarker"
-        android:text="saveMarker" />
-
-    <Button
-        android:id="@+id/saveMarker2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:onClick="saveMarker2"
-        android:text="saveMarker2" />
-
 
 </FrameLayout>

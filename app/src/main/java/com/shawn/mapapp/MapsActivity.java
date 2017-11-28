@@ -60,8 +60,6 @@ public class MapsActivity extends FragmentActivity implements
     private CameraPosition mCameraPosition;
 
     private static final String TAG = MapsActivity.class.getSimpleName();
-    private static final int RESULT_LOAD_IMG = 0;
-    private static final int RESULT_LOAD_IMG_2 = 1;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -339,75 +337,6 @@ public class MapsActivity extends FragmentActivity implements
         startActivity(intent);
     }
 
-    public void saveMarker(View view) {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, RESULT_LOAD_IMG);
-    }
-    public void saveMarker2(View view) {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, RESULT_LOAD_IMG_2);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RESULT_LOAD_IMG) {
-            if (resultCode == RESULT_OK) {
-//                try {
-                    Uri imageUri = data.getData();
-                    // TODO: Move to search recycler view and info window
-//                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-//                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                    Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
-//                }
-                Intent intent = getIntent();
-                long id = db.insertData("name", 10.203942, 9.94930, 1.0f, intent.getStringExtra("username"), imageUri.toString());
-                if (id < 0) {
-                    Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show();
-            }
-        }
-        if (requestCode == RESULT_LOAD_IMG_2) {
-            if (resultCode == RESULT_OK) {
-//                try {
-                Uri imageUri = data.getData();
-                // TODO: Move to search recycler view
-//                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-//                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                    Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
-//                }
-                Intent intent = getIntent();
-                long id = db.insertData("green", 10.203942, 9.94930, 1.0f, intent.getStringExtra("username"), imageUri.toString());
-                if (id < 0) {
-                    Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show();
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-//    @Override
-//    public void onMapLongClick(LatLng point) {
-//        Toast.makeText(this, "Point pressed: " + point, Toast.LENGTH_SHORT).show();
-//        mMap.addMarker(new MarkerOptions()
-//                .position(point)
-//                .title("Our Custom Marker")
-//                .draggable(true));
-//    }
-
     @Override
     public void onMapClick(LatLng point) {
         Toast.makeText(this, "Point pressed: " + point, Toast.LENGTH_SHORT).show();
@@ -453,7 +382,4 @@ public class MapsActivity extends FragmentActivity implements
 
         infoModal.show(fm, "fragment_edit_name");
     }
-
-
-    // TODO: Add ability to clear markers
 }

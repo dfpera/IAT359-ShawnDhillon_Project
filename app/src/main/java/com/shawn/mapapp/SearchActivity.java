@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -57,12 +60,32 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: Add on click listener to recycler view items (goes back to map)
-    //    @Override
-    //    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    //        LinearLayout clickedRow = (LinearLayout) view;
-    //        TextView plantNameTextView = (TextView) view.findViewById(R.id.plantNameEntry);
-    //        TextView plantTypeTextView = (TextView) view.findViewById(R.id.plantTypeEntry);
-    //        Toast.makeText(this, "row " + (1+position) + ":  " + plantNameTextView.getText() +" "+plantTypeTextView.getText(), Toast.LENGTH_LONG).show();
-    //    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.mapMenu:
+                Intent oldIntent = getIntent();
+                intent = new Intent(this, MapsActivity.class);
+                intent.putExtra("username", oldIntent.getExtras().getString("username"));
+                startActivity(intent);
+                return true;
+            case R.id.logoutMenu:
+                intent = new Intent(this, MainActivity.class);
+                // Stop user from going back in activity stack
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

@@ -47,7 +47,6 @@ public class MyDatabase {
         return cursor;
     }
 
-    // TODO: Search DB based on whether name CONTAINS string
     public Cursor getSelectedData(String username, String name)
     {
         // Select the markers that are owned by a username
